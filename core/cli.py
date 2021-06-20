@@ -1,8 +1,9 @@
 import argparse
 
 
-help_msg='''
+help_msg = '''
     -q, --query      - Dork that will be used in the search engine.
+    -u, --url        - Target url if you want to test special site
     -r, --results    - Number of results brought by the search engine.
     -s, --start-page - Home page of search results.
     -t, --timeout    - Timeout of requests.
@@ -21,6 +22,11 @@ class Cli:
         parser.add_argument('-q',
                             '--query',
                             required=True)
+
+        # parser.add_argument('-u',
+        #                     '--url',
+        #                     type=str,
+        #                     required=False)
 
         parser.add_argument('-r',
                             '--results',

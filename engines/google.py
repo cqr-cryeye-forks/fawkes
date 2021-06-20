@@ -34,8 +34,8 @@ class GoogleSearch:
         google_url = self._load_random_google_url()
         user_agent = self._load_user_random_agents()
 
-        print(colored(f"Random google URL: {google_url}", "green"))
-        print(colored(f"Random User-Agent: {user_agent}", "green"))
+        # print(f"Random google URL: {google_url}")
+        # print(f"Random User-Agent: {user_agent}")
 
         try:
             req = requests.get(
@@ -47,7 +47,7 @@ class GoogleSearch:
                 })
 
         except requests.exceptions.RequestException as e:
-            print(f"[+] Requests error: {e}")
+            print(f"Requests error: {e}")
             sys.exit(1)
 
         if self._malicious_traffic in req.text:
