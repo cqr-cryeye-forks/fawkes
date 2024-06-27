@@ -3,7 +3,8 @@ import argparse
 
 help_msg = '''
     -q, --query      - Dork that will be used in the search engine.
-    -u, --url        - Target url if you want to test special site
+    -o, --output     - Save result in output file. Example: data.json
+    # -u, --url        - Target url if you want to test special site
     -r, --results    - Number of results brought by the search engine.
     -s, --start-page - Home page of search results.
     -t, --timeout    - Timeout of requests.
@@ -21,6 +22,10 @@ class Cli:
 
         parser.add_argument('-q',
                             '--query',
+                            required=True)
+
+        parser.add_argument('-o',
+                            '--output',
                             required=True)
 
         # parser.add_argument('-u',
