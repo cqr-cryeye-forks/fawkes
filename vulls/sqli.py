@@ -11,6 +11,7 @@ init(autoreset=True)
 class Sqli:
     def __init__(self, verbose):
         self._verbose = verbose
+        self.data = []
 
     def _insert_sqli_payloads(self, url):
         parser_url = urlparse(url)
@@ -63,6 +64,17 @@ class Sqli:
 
             if self._check_error(response.text):
                 print(f"[SUCCESS] - {url}")
+                data1 = {
+                    "Success": url
+                }
+                self.data.append(data1)
 
             if self._verbose:
                 print(f"[ERROR] - {url}")
+                data1 = {
+                    "Error": url
+                }
+                self.data.append(data1)
+
+    def data_return(self):
+        return self.data
