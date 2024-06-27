@@ -52,5 +52,9 @@ class Scan(Filter):
         MAIN_DIR: Final[pathlib.Path] = pathlib.Path(__file__).parent.parent
         OUTPUT_JSON: Final[pathlib.Path] = MAIN_DIR / self.args.output
         print("-" * 111, "\n", "SAVE RESULT IN:", OUTPUT_JSON)
+        if data == []:
+            data = {
+                "Empty": "Nothing found by Fawkes"
+                }
         with open(OUTPUT_JSON, "w") as jf:
             json.dump(data, jf, indent=2)
