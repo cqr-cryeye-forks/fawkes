@@ -1,10 +1,11 @@
+import time
+
 import requests
 import random
 import sys
 
 from core.errors import GoogleError
 from colorama import init
-from termcolor import colored
 
 # use Colorama to make Termcolor work on Windows too
 init(autoreset=True)
@@ -19,38 +20,45 @@ class GoogleSearch:
     def _load_user_random_agents(self):
         with open("commonlist/user_agents.txt", "r") as user_agent:
             user_agents = user_agent.read().splitlines()
-            user_agent = random.choice(list(user_agents))
+            # user_agent = random.choice(list(user_agents))
 
-        return user_agent
+        return user_agents
 
     def _load_random_google_url(self):
         with open("commonlist/google_url.txt", "r") as google_url:
             google_urls = google_url.read().splitlines()
-            google_url = random.choice(list(google_urls))
+            # google_url = random.choice(list(google_urls))
 
-        return google_url
+        return google_urls
 
     def request(self):
-        google_url = self._load_random_google_url()
-        user_agent = self._load_user_random_agents()
+        google_urls = self._load_random_google_url()
+        user_agents = self._load_user_random_agents()
 
         # print(f"Random google URL: {google_url}")
         # print(f"Random User-Agent: {user_agent}")
+        list_requests = []
+        list_error = []
+        t_start = time.time()
+        for google_url in google_urls:
+            for user_agent in user_agents:
+                try:
+                    req = requests.get(
+                        url=google_url,
+                        params=self.params,
+                        timeout=self.timeout,
+                        headers={
+                            "User-Agent": user_agent
+                        })
+                except requests.exceptions.RequestException as e:
+                    print(f"Requests error: {e}")
+                    exit(1)
 
-        try:
-            req = requests.get(
-                url=google_url,
-                params=self.params,
-                timeout=self.timeout,
-                headers={
-                    "User-Agent": user_agent
-                })
-
-        except requests.exceptions.RequestException as e:
-            print(f"Requests error: {e}")
-            sys.exit(1)
-
-        if self._malicious_traffic in req.text:
-            raise GoogleError("Google detected malicious traffic")
-
-        return req
+                if self._malicious_traffic in req.text:
+                    data_Error = {"GoogleError": "Google detected malicious traffic"}
+                    list_error.append(data_Error)
+                list_requests.append(req)
+            if time.time() - t_start >= 360:
+                print("BREAK of main cycle")
+                break
+        return list_requests

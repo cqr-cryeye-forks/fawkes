@@ -1,5 +1,6 @@
 import json
 import pathlib
+import time
 from typing import Final
 
 from core.filter import Filter
@@ -33,28 +34,32 @@ class Scan(Filter):
         return response
 
     def scan(self):
-        response = self._get_response()
+        responses = self._get_response()
+        all_result = []
+        for response in responses:
+            # links = Filter(response).filter_links()
+            # links_parsed = self.remove_links(links)
+            links_parsed = [self.args.query]
 
-        links = Filter(response).filter_links()
-        links_parsed = self.remove_links(links)
-        links_parsed = [self.args.query]
+            print(f"Number of targets: {len(links_parsed)}")
+            print("-" * 111)
+            time.sleep(1111)
 
-        print(f"Number of targets: {len(links_parsed)}")
-        print("-" * 111)
-
-        sqli = Sqli(self.args.verbose)
-        data = sqli.data_return()
-        pool = ThreadPool(self.args.threads)
-        pool_exec = pool.map(sqli.check_vull, links_parsed)
-        pool.close()
-        pool.join()
+            sqli = Sqli(self.args.verbose)
+            data = sqli.data_return()
+            pool = ThreadPool(self.args.threads)
+            pool_exec = pool.map(sqli.check_vull, links_parsed)
+            pool.close()
+            pool.join()
+            result = {"data": data}
+            all_result.append(result)
 
         MAIN_DIR: Final[pathlib.Path] = pathlib.Path(__file__).parent.parent
         OUTPUT_JSON: Final[pathlib.Path] = MAIN_DIR / self.args.output
         print("-" * 111, "\n", "SAVE RESULT IN:", OUTPUT_JSON)
-        if data == []:
-            data = {
+        if all_result == []:
+            all_result = {
                 "Empty": "Nothing found by Fawkes"
                 }
         with open(OUTPUT_JSON, "w") as jf:
-            json.dump(data, jf, indent=2)
+            json.dump(all_result, jf, indent=2)
