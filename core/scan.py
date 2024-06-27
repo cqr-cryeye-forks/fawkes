@@ -1,3 +1,7 @@
+import json
+import pathlib
+from typing import Final
+
 from core.filter import Filter
 from engines.google import GoogleSearch
 from vulls.sqli import Sqli
@@ -18,28 +22,35 @@ class Scan(Filter):
         self.args.query = self.args.query
         # .replace("//", "/")
         params = {
-            'q': self.args.query,
+            'query': self.args.query,
             'start': self.args.start_page,
             'num': self.args.results
         }
-        # print(params)
+        print(params)
         req = GoogleSearch(params=params, timeout=self.args.timeout)
         response = req.request()
 
         return response
 
     def scan(self):
-        # response = self._get_response()
-        #
-        # links = Filter(response).filter_links()
-        # links_parsed = self.remove_links(links)
+        response = self._get_response()
+
+        links = Filter(response).filter_links()
+        links_parsed = self.remove_links(links)
         links_parsed = [self.args.query]
 
-        # print(f"Number of targets: {len(links_parsed)}")
-        # print("-" * 79, "grey")
+        print(f"Number of targets: {len(links_parsed)}")
+        print("-" * 111)
 
         sqli = Sqli(self.args.verbose)
+        data = sqli.data_return()
         pool = ThreadPool(self.args.threads)
         pool_exec = pool.map(sqli.check_vull, links_parsed)
         pool.close()
         pool.join()
+
+        MAIN_DIR: Final[pathlib.Path] = pathlib.Path(__file__).parent.parent
+        OUTPUT_JSON: Final[pathlib.Path] = MAIN_DIR / self.args.output
+        print("-" * 111, "\n", "SAVE RESULT IN:", OUTPUT_JSON)
+        with open(OUTPUT_JSON, "w") as jf:
+            json.dump(data, jf, indent=2)
