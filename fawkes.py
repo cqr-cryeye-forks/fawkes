@@ -1,8 +1,5 @@
-import sys
-
 from core.cli import Cli
 from core.scan import Scan
-from core.banner import banner
 
 
 def main():
@@ -13,5 +10,6 @@ def main():
 
 
 if __name__ == '__main__':
-    # banner()
+    print("Start")
     main()
+    print("End")
