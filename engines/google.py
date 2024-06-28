@@ -58,7 +58,7 @@ class GoogleSearch:
                     data_Error = {"GoogleError": "Google detected malicious traffic"}
                     list_error.append(data_Error)
                 list_requests.append(req)
-            if time.time() - t_start >= 360:
+            if time.time() - t_start >= 3600:
                 print("BREAK of main cycle")
                 break
         return list_requests
