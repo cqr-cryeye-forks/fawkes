@@ -29,9 +29,9 @@ class Scan(Filter):
         }
         print(params)
         req = GoogleSearch(params=params, timeout=self.args.timeout)
-        response = req.request()
-
-        return response
+        list_response = req.request()
+        print(list_response)
+        return list_response
 
     def scan(self):
         responses = self._get_response()
