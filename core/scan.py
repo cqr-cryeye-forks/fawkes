@@ -43,7 +43,6 @@ class Scan(Filter):
 
             print(f"Number of targets: {len(links_parsed)}")
             print("-" * 111)
-            time.sleep(1111)
 
             sqli = Sqli(self.args.verbose)
             data = sqli.data_return()
