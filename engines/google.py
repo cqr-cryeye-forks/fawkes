@@ -40,7 +40,7 @@ class GoogleSearch:
         list_requests = []
         list_error = []
         t_start = time.time()
-        for google_url in google_urls:
+        for i, google_url in enumerate(google_urls):
             for user_agent in user_agents:
                 try:
                     req = requests.get(
@@ -58,7 +58,8 @@ class GoogleSearch:
                     data_Error = {"GoogleError": "Google detected malicious traffic"}
                     list_error.append(data_Error)
                 list_requests.append(req)
-            if time.time() - t_start >= 3600:
+            print(i, time.time() - t_start)
+            if time.time() - t_start >= 3600:   # 1/3 of all google_urls
                 print("BREAK of main cycle")
                 break
         return list_requests
