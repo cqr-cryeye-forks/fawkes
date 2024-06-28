@@ -37,12 +37,12 @@ class Scan(Filter):
         responses = self._get_response()
         all_result = []
         for response in responses:
-            # links = Filter(response).filter_links()
-            # links_parsed = self.remove_links(links)
-            links_parsed = [self.args.query]
-
-            print(f"Number of targets: {len(links_parsed)}")
-            print("-" * 111)
+            links = Filter(response).filter_links()
+            links_parsed = self.remove_links(links)
+            # links_parsed = [self.args.query]
+            if len(links_parsed) > 0:
+                print(f"Number of targets: {len(links_parsed)}")
+                print("-" * 111)
 
             sqli = Sqli(self.args.verbose)
             data = sqli.data_return()
