@@ -34,7 +34,8 @@ class GoogleSearch:
     def request(self):
         google_urls = self._load_random_google_url()
         user_agents = self._load_user_random_agents()
-
+        random.shuffle(google_urls)
+        random.shuffle(user_agents)
         # print(f"Random google URL: {google_url}")
         # print(f"Random User-Agent: {user_agent}")
         list_requests = []
