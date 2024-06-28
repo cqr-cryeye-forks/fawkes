@@ -44,14 +44,14 @@ class Scan(Filter):
                 print(f"Number of targets: {len(links_parsed)}")
                 print("-" * 111)
 
-            sqli = Sqli(self.args.verbose)
-            data = sqli.data_return()
-            pool = ThreadPool(self.args.threads)
-            pool_exec = pool.map(sqli.check_vull, links_parsed)
-            pool.close()
-            pool.join()
-            result = {"data": data}
-            all_result.append(result)
+                sqli = Sqli(self.args.verbose)
+                data = sqli.data_return()
+                pool = ThreadPool(self.args.threads)
+                pool_exec = pool.map(sqli.check_vull, links_parsed)
+                pool.close()
+                pool.join()
+                result = {"data": data}
+                all_result.append(result)
 
         MAIN_DIR: Final[pathlib.Path] = pathlib.Path(__file__).parent.parent
         OUTPUT_JSON: Final[pathlib.Path] = MAIN_DIR / self.args.output
