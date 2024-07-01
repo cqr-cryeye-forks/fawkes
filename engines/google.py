@@ -53,7 +53,6 @@ class GoogleSearch:
                         })
                 except requests.exceptions.RequestException as e:
                     print(f"Requests error: {e}")
-                    exit(1)
 
                 if self._malicious_traffic in req.text:
                     data_Error = {"GoogleError": "Google detected malicious traffic"}
