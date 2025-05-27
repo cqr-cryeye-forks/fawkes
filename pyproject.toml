@@ -1,0 +1,16 @@
+[project]
+name = "fawkes"
+version = "1.0.0"
+description = "SQLi dork scanner"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "lxml",
+    "termcolor",
+    "colorama"
+]
+
+[project.scripts]
+fawkes = "fawkes.fawkes:main"
