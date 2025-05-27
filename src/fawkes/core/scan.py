@@ -1,14 +1,13 @@
 # src/core/scan.py
 """
 Core scanning functionality: fetches search results, filters links, and tests for SQLi.
-Supports both Google Dork search and single URL scanning.
 """
 import json
 import logging
 import pathlib
 from argparse import Namespace
 from multiprocessing.dummy import Pool as ThreadPool
-from typing import Any, List, Dict
+from typing import Any
 
 from fawkes.core.filter import Filter
 from fawkes.engines.google import GoogleSearch
@@ -21,53 +20,44 @@ class Scan:
     def __init__(self, args: Namespace) -> None:
         self.args = args
 
-    def _fetch_responses(self) -> List[Any]:
+    def _fetch_responses(self) -> list[Any]:
         params = {
             'query': self.args.query,
             'start': self.args.start_page,
             'num': self.args.results
         }
-        logger.debug("Search params: %s", params)
+        logger.debug(f"Search params: {params}")
         searcher = GoogleSearch(params=params, timeout=self.args.timeout)
         return searcher.request()
 
     def scan(self) -> None:
-        """
-        Execute scanning: if URL provided, test it directly; otherwise perform Google search.
-        """
-        all_results: List[Dict[str, Any]] = []
+        logger.info("Fetching search results...")
+        responses = self._fetch_responses()
+        all_results: list[dict[str, Any]] = []
 
-        if self.args.url:
-            # Direct URL mode
-            logger.info("Testing single URL for SQLi: %s", self.args.url)
-            sqli = Sqli(verbose=self.args.verbose)
-            sqli.check_vull(self.args.url)
-            all_results.append({'vulnerabilities': sqli.data_return()})
-        else:
-            # Google Dork mode
-            logger.info("Fetching search results...")
-            responses = self._fetch_responses()
-            for response in responses:
-                links = Filter(response).filter_links()
-                valid_links = Filter(response).remove_links(links)
+        for response in responses:
+            links = Filter(response).filter_links()
+            valid_links = Filter(response).remove_links(links)
 
-                if not valid_links:
-                    continue
+            if not valid_links:
+                continue
 
-                logger.info("Testing %d targets for SQLi...", len(valid_links))
-                sqli = Sqli(verbose=self.args.verbose)
-                with ThreadPool(self.args.threads) as pool:
-                    pool.map(sqli.check_vull, valid_links)
-                all_results.append({'vulnerabilities': sqli.data_return()})
+            logger.info(f"Testing {len(valid_links)} targets for SQLi...")
+            sqli_tester = Sqli(verbose=self.args.verbose)
+            with ThreadPool(self.args.threads) as pool:
+                pool.map(sqli_tester.check_vull, valid_links)
 
-        # Save results to JSON
+            result = {'vulnerabilities': sqli_tester.data_return()}
+            all_results.append(result)
+
         output_path = pathlib.Path(self.args.output)
-        if not all_results or all_results == [{'vulnerabilities': []}]:
+        if not all_results:
             logger.warning("No vulnerabilities found.")
-            output_data = {'Empty': 'Nothing found by Fawkes'}
+            summary = {'Empty': 'Nothing found by Fawkes'}
+            output_data = summary
         else:
             output_data = all_results
 
-        logger.info("Saving results to %s", output_path)
+        logger.info(f"Saving results to {output_path}")
         output_path.write_text(json.dumps(output_data, indent=2), encoding='utf-8')
         logger.info("Scan complete.")
